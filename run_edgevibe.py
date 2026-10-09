@@ -19,6 +19,15 @@ from edge_vibe.diagnostics.alarm_manager import AlarmManager
 from edge_vibe.gateway.modbus_publisher import ModbusHoldingRegisterMap
 from edge_vibe.gateway.logger import TimeSeriesLogger
 
+import sys
+
+# Enable UTF-8 encoding support on Windows console
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 class Color:
     GREEN = "\033[92m"
     CYAN = "\033[96m"
@@ -49,7 +58,7 @@ def render_ascii_spectrum(freqs: np.ndarray, amps: np.ndarray, num_bins: int = 1
         mask = (f_sub >= bin_edges[i]) & (f_sub < bin_edges[i+1])
         b_amp = np.max(a_sub[mask]) if np.any(mask) else 0.0
         bar_len = int((b_amp / max_amp) * 12)
-        bar_str = "█" * bar_len + "░" * (12 - bar_len)
+        bar_str = "#" * bar_len + "-" * (12 - bar_len)
         f_mid = int((bin_edges[i] + bin_edges[i+1]) / 2)
         bars.append(f"{f_mid:>3}Hz: [{bar_str}]")
 
@@ -151,7 +160,7 @@ def main():
 
             print(f"\n{Color.BOLD}MULTI-SENSOR TELEMETRY:{Color.RESET}")
             print(f"  Acoustic Emission : {ae_features['rms']*100:.2f} mV RMS")
-            print(f"  Bearing Temp      : {curr_temp:.1f} °C")
+            print(f"  Bearing Temp      : {curr_temp:.1f} deg C")
             print(f"  Normal Load Force : {curr_force:.1f} N")
             print(f"  Dominant Peak     : {peak_freq:.1f} Hz (Amp: {peak_amp:.3f})")
 
